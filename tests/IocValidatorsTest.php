@@ -1,7 +1,7 @@
 <?php
 
-require '../IocValidators.php';
-require 'fakes/SubjectFake.php';
+require_once '../IocValidators.php';
+require_once 'fakes/SubjectFake.php';
 
 class IocValidatorsTest extends PHPUnit_Framework_TestCase {
 

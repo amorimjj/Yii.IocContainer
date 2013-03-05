@@ -12,7 +12,16 @@ Yii::import('ext.IocContainer.exceptions.*');
 class IocContainer extends CApplicationComponent
 {
     private $_registers = array();
+    private $_registeredInstances = array();
     
+    /**
+     * 
+     * @param string $interfaceName Name of interface
+     * @param string $className Name of class
+     * @throws InvalidInterfaceException
+     * @throws InvalidClassException
+     * @throws InvalidClassToInterfaceException
+     */
     protected function validateRegister($interfaceName, $className)
     {
         if ( !IocValidators::isInterface($interfaceName))
@@ -71,6 +80,14 @@ class IocContainer extends CApplicationComponent
         $this->_registers[$interfaceName] = $className;
     }
     
+    public function registerInstance($object, $instance)
+    {
+        if ( ! $instance instanceof $object )
+            throw new InvalidInstanceException($object);
+        
+        $this->_registeredInstances[$object] = $instance;
+    }
+    
     public function getClassTo($interfaceName)
     {
         if ( !isset($this->_registers[$interfaceName]))
@@ -80,6 +97,9 @@ class IocContainer extends CApplicationComponent
     }
     public function getInstance($object)
     {
+        if ( isset($this->_registeredInstances[$object]) )
+            return $this->_registeredInstances[$object];
+        
         if ( IocValidators::isInterface($object))
             return $this->getInstanceToInterface($object);
         

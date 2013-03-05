@@ -9,9 +9,14 @@ require 'fakes/ClassTest3.php';
 require 'fakes/ClassTest4.php';
 require 'fakes/ClassTest5.php';
 require 'fakes/ClassTest6.php';
+require 'fakes/ClassTest7.php';
 
 class IocContainerTest extends PHPUnit_Framework_TestCase {
 
+    /**
+     *
+     * @var IocContainer 
+     */
     private $_ioc;
     
     public function setup()
@@ -90,5 +95,33 @@ class IocContainerTest extends PHPUnit_Framework_TestCase {
     {
         $this->_ioc->register('ITest', 'ClassTest6');
         $this->assertInstanceOf('ClassTest5', $this->_ioc->getInstance('ClassTest5'));
+    }
+    
+    public function testRegisterInstance_WhenTryRegisterAnInstanceAndInstanceNotTypeOfObject_ShouldThrowInvalidInstance()
+    {
+        $this->setExpectedException('InvalidInstanceException', 'Instance is invalid to ClassTest5');
+        $instance = new ClassTest1();
+        $this->_ioc->registerInstance('ClassTest5', $instance);
+    }
+    
+    public function testRegisterInstance_WhenTryRegisterAValidInstanceAndInstance_ShouldRegisterInstance()
+    {
+        $instance = new ClassTest2();
+        $this->_ioc->registerInstance('ITest', $instance);
+        $this->assertSame($instance, $this->_ioc->getInstance('ITest'));
+    }
+    
+    public function testRegisterInstance_WhenTryRegisterAValidInstanceAndInstance_ShouldRegisterInstance1()
+    {
+        $instance = new ClassTest7();
+        $this->_ioc->registerInstance('ClassTest1', $instance);
+        $this->assertSame($instance, $this->_ioc->getInstance('ClassTest1'));
+    }
+    
+    public function testRegisterInstance_WhenTryRegisterAValidInstanceAndInstance_ShouldRegisterInstance2()
+    {
+        $instance = new ClassTest1();
+        $this->_ioc->registerInstance('ClassTest1', $instance);
+        $this->assertSame($instance, $this->_ioc->getInstance('ClassTest1'));
     }
 }
