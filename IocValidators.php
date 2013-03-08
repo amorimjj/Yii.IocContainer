@@ -24,11 +24,40 @@ class IocValidators
         return @class_exists($className);
     }
     
+    /**
+     *
+     * @param string $interfaceName
+     * @param string $className
+     * @return boolean 
+     */
     public static function isInterfaceImplementedByClass($interfaceName, $className)
     {
         $class = new ReflectionClass($className);
         return $class->implementsInterface($interfaceName);
     }
+    
+    /**
+     *
+     * @param string $object Interface or class to register
+     * @param object $instance Instance of Interface or class informed
+     * @return boolean 
+     */
+    public static function isInstanceValidToObject($object, $instance)
+    {
+        return ($instance instanceof $object);
+    }
+    
+    /**
+     *
+     * @param array $registers
+     * @return boolean 
+     */
+    public static function isValidRegister($registers)
+    {
+        return is_array($registers);
+    }
+    
+    
 
 }
 

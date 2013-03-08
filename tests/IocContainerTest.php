@@ -124,4 +124,40 @@ class IocContainerTest extends PHPUnit_Framework_TestCase {
         $this->_ioc->registerInstance('ClassTest1', $instance);
         $this->assertSame($instance, $this->_ioc->getInstance('ClassTest1'));
     }
+    
+    public function testSetRegisters_WhenSetInvalidRegisters_ShouldThrowException()
+    {
+        $this->setExpectedException('InvalidArgumentException', 'Argument registers should be an array');
+        $this->_ioc->setRegisters(null);
+    }
+    
+    public function testSetRgisters_WhenSetValidRegisters_CantCallRegisterUntilTryRetrieveInstance()
+    {
+        $ioc = $this->getMock('IocContainer', array('register'));
+        $ioc->expects($this->never())
+                ->method('register');
+        
+        $this->_ioc->setRegisters(array('ITest', 'ClassTest6'));
+    }
+    
+    public function testGetSingletonInstance_WhenTryGetSingletonInstance_ShouldReturnAlwaysTheSameInstance()
+    {
+        $this->_ioc->register('ITest', 'ClassTest2');
+        $instance1 = $this->_ioc->getSingletonInstance('ClassTest3');
+        $instance2 = $this->_ioc->getSingletonInstance('ClassTest3');
+        
+        $this->assertSame($instance1, $instance2);
+    }
+    
+    public function testGetInstance_WhenTryGetSingletonAndNewInstance_ShouldReturnSingletonToSingletonAndNewToNew()
+    {
+        $this->_ioc->register('ITest', 'ClassTest2');
+        $instance1 = $this->_ioc->getSingletonInstance('ClassTest3');
+        $instance2 = $this->_ioc->getInstance('ClassTest3');
+        $instance3 = $this->_ioc->getSingletonInstance('ClassTest3');
+        
+        $this->assertNotSame($instance1, $instance2);
+        $this->assertSame($instance1, $instance3);
+    }
+
 }
