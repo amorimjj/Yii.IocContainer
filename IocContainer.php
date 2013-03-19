@@ -79,14 +79,26 @@ class IocContainer extends CApplicationComponent
     
     protected function registerFromInitIfFound($object)
     {
-        if (isset($this->_initRegisters[$object]))
+        if (isset($this->_initRegisters[$object]) && !isset($this->_registeredInstances[$object]))
         {
             $completeClassName = $this->_initRegisters[$object];
             Yii::import($completeClassName);
-            $this->register($object, IocInfrastructure::getClassFromCompleteClassName($completeClassName));
+            
+            if ( IocValidators::isInterface($object))
+                $this->register($object, IocInfrastructure::getClassFromCompleteClassName($completeClassName));
+            else 
+                $this->registerInstance($object, $this->getInstance(IocInfrastructure::getClassFromCompleteClassName($completeClassName)));
         }   
     }
     
+    protected function getInstanceFromRegisters($object)
+    {
+        $this->registerFromInitIfFound($object);
+        
+        if ( isset($this->_registeredInstances[$object]) )
+            return $this->_registeredInstances[$object];
+    }
+
     public function register($interfaceName, $className)
     {
         $this->validateRegister($interfaceName, $className);
@@ -111,11 +123,9 @@ class IocContainer extends CApplicationComponent
     
     public function getInstance($object)
     {
-        if ( isset($this->_registeredInstances[$object]) )
-            return $this->_registeredInstances[$object];
-        
-        $this->registerFromInitIfFound($object);
-        
+        if ( $instance = $this->getInstanceFromRegisters($object) )
+            return $instance;
+       
         if ( IocValidators::isInterface($object))
             return $this->getInstanceToInterface($object);
         
@@ -139,5 +149,12 @@ class IocContainer extends CApplicationComponent
         $this->_initRegisters = $registers;
     }
     
+    public function init()
+    {
+        parent::init();
+        $this->_registers = array();
+        $this->_registeredInstances = array();
+        $this->_singletonInstances = array();
+    }
 }
 ?>

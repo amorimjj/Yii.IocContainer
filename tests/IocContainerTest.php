@@ -159,5 +159,43 @@ class IocContainerTest extends PHPUnit_Framework_TestCase {
         $this->assertNotSame($instance1, $instance2);
         $this->assertSame($instance1, $instance3);
     }
+    
+    public function testSetRegisters_WhenITryRegisterAInstanceToClass_ShouldRegisterInstance()
+    {
+        $this->_ioc->setRegisters(array('Class2'=>'Class3'));
+        $this->_ioc->getInstance('Class2');
+    }
+            
+    public function testGetInstance_WhenTryGetAInstanceForARegisteredClass_ShouldReturnRegisteredClass()
+    {
+        $this->_ioc->setRegisters(array('Class2'=>'Class3'));
+        $this->assertInstanceOf('Class3', $this->_ioc->getInstance('Class2'));
+    }
 
+    public function testGetInstance_WhenNewInstanceThatDependsFromARegisteredInstance_ShouldReceiveARegisteredInstance()
+    {
+        $this->_ioc->setRegisters(array('Class2'=>'Class3'));
+        $instance1 = $this->_ioc->getInstance('Class1');
+        $instance2 = $this->_ioc->getInstance('Class2');
+        $this->assertSame($instance1->class, $instance2);
+    }
+    
 }
+
+class Class1 {
+    public $class;
+    
+    public function __construct(Class2 $class) {
+        $this->class = $class;
+    }
+}
+
+class Class2 {
+       
+}
+
+class Class3 extends Class2 {
+    
+}
+
+?>
