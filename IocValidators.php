@@ -48,13 +48,21 @@ class IocValidators
     }
     
     /**
-     *
      * @param array $registers
      * @return boolean 
      */
     public static function isValidRegister($registers)
     {
         return is_array($registers);
+    }
+    
+    /**
+     * @param string $namespace
+     * @return boolean
+     */
+    public static function isValidYiiNamespace($namespace)
+    {
+        return  ! (strpos($namespace, '.') === false );
     }
     
     

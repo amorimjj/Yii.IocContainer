@@ -10,6 +10,8 @@ require 'fakes/ClassTest4.php';
 require 'fakes/ClassTest5.php';
 require 'fakes/ClassTest6.php';
 require 'fakes/ClassTest7.php';
+require 'fakes/ITest2.php';
+require 'fakes/ClassTest8.php';
 
 class IocContainerTest extends PHPUnit_Framework_TestCase {
 
@@ -159,5 +161,28 @@ class IocContainerTest extends PHPUnit_Framework_TestCase {
         $this->assertNotSame($instance1, $instance2);
         $this->assertSame($instance1, $instance3);
     }
+    
+    public function testGetInstance_WhenTryGetAInstanceAndClassAsDefaultParameterToConstructor_ShouldReturnInstance()
+    {
+        $dateTime = $this->_ioc->getInstance('TesteDateTime');
+        $this->assertInstanceOf('TesteDateTime', $dateTime);
+    }
+    
+    public function testGetInstance_WhenTryGetAInstanceOfNamespace_ShouldReturnInstance()
+    {
+        $this->_ioc->register('test\name_space\ITest2', 'ClassTest8');
+        $instance = $this->_ioc->getInstance('test\name_space\ITest2');
+        $this->assertInstanceOf('ClassTest8', $instance);
+    }
 
 }
+
+class TesteDateTime
+{
+    private $_now;
+    public function __construct(DateTime $now) {
+        $this->_now = $now;
+    }
+}
+
+?>

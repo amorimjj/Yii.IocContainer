@@ -34,4 +34,14 @@ class IocValidatorsTest extends PHPUnit_Framework_TestCase {
     {
         $this->assertTrue(IocValidators::isInterfaceImplementedByClass('SplSubject', 'SubjectFake'));
     }
+    
+    public function testIsValidYiiNamespace_WhenReceiveAValidNamespace_ShouldReturnTrue()
+    {
+        $this->assertTrue(IocValidators::isValidYiiNamespace('application.controller.MyController'));
+    }
+    
+    public function testIsValidYiiNamespace_WhenReceiveAnInvalidNamespace_ShouldReturnFalse()
+    {
+        $this->assertFalse(IocValidators::isValidYiiNamespace('\Namespace\lib\ClassName'));
+    }
 } 
