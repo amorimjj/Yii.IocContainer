@@ -10,6 +10,7 @@ require 'fakes/ClassTest4.php';
 require 'fakes/ClassTest5.php';
 require 'fakes/ClassTest6.php';
 require 'fakes/ClassTest7.php';
+require 'fakes/ClassTest8.php';
 
 class IocContainerTest extends PHPUnit_Framework_TestCase {
 
@@ -180,6 +181,38 @@ class IocContainerTest extends PHPUnit_Framework_TestCase {
         $this->assertSame($instance1->class, $instance2);
     }
     
+    public function testSetRegisters_WhenTrySetANewRegister_SecondParamentCouldBeAnArray()
+    {
+        $this->_ioc->setRegisters(array('Class2'=>array('class'=>'Class4')));
+        $this->assertInstanceOf('Class4', $this->_ioc->getInstance('Class2'));
+    }
+    
+    public function testSetRegisters_WhenTrySetANewRegisterAndSecondParameterIsAnArray_SecondParamentShouldHasAKeyClass()
+    {
+        $this->setExpectedException('InvalidArgumentException', 'Class parameter should has a \'class\' key');
+        $this->_ioc->setRegisters(array('Class2'=>array('erro'=>'Class4')));
+    }
+    
+    public function testSetRegisters_WhenTrySetANewRegisterAndSecondParameterIsAnArray_ShouldSetParametersValue()
+    {
+        $this->_ioc->setRegisters(array('Class2'=>array('class'=>'Class4','prop1'=>'value1')));
+        $instance1 = $this->_ioc->getInstance('Class2');
+        $this->assertEquals('value1', $instance1->prop1);
+    }
+    
+    public function testSetRegisters_WhenTrySetANewRegisterAndSecondParameterIsAnArrayAndParameterToSetIsInvalid_ShouldThrowException()
+    {
+        $this->setExpectedException('InvalidArgumentException', 'Class \'Class4\' doesn\'t have a property called \'prop2\'');
+        $this->_ioc->setRegisters(array('Class2'=>array('class'=>'Class4','prop2'=>'value1')));
+        $this->_ioc->getInstance('Class2');
+    }
+    
+    public function testSetRegisters_WhenTrySetANewRegisterToNamespacedClassAndSecondParameterIsAnArray_ShouldSetParametersValue()
+    {
+        $this->_ioc->setRegisters(array('ITest'=>array('class'=>'test\fakes\ClassTest8','prop1'=>'value1')));
+        $instance1 = $this->_ioc->getInstance('ITest');
+        $this->assertEquals('value1', $instance1->prop1);
+    }
 }
 
 class Class1 {
@@ -196,6 +229,10 @@ class Class2 {
 
 class Class3 extends Class2 {
     
+}
+
+class Class4 extends Class2 {
+    public $prop1 = null;    
 }
 
 ?>
