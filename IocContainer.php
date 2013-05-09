@@ -63,13 +63,41 @@ class IocContainer extends CApplicationComponent
         return $constructorArguments;
     }
     
+    protected function getParametersToInstance($instance)
+    {
+        foreach ($this->_initRegisters as $value)
+        {
+            if (is_array($value) && $value['class'] == get_class($instance) )
+                return $value;
+        }
+        
+        return array();
+    }
+    
+    protected function setInstanceProperty($instance, $property, $value)
+    {
+       if ( ! property_exists($instance, $property ) )
+           throw new InvalidArgumentException('Class \'' .  get_class($instance) . '\' doesn\'t have a property called \''. $property . '\'');
+     
+       $instance->{$property} = $value;
+    }
+
+
+    protected function startParameters($instance)
+    {
+        foreach( $this->getParametersToInstance($instance) as $key => $value )
+            if ( $key !== 'class') $this->setInstanceProperty($instance, $key, $value);
+            
+        return $instance;
+    }
+
+
     protected function getInstanceToClass($className)
     {
         if ( !IocValidators::isValidClass($className))
             throw new InvalidClassException($className);
         
         $class = new ReflectionClass($className);
-        $constructor = $class->getConstructor();
         
         if ( ! $constructor = $class->getConstructor() )
             return $class->newInstance();
@@ -79,17 +107,26 @@ class IocContainer extends CApplicationComponent
     
     protected function registerFromInitIfFound($object)
     {
-        if (isset($this->_initRegisters[$object]))
+        if (isset($this->_initRegisters[$object]) && !isset($this->_registeredInstances[$object]))
         {
-            $completeClassName = $this->_initRegisters[$object];
+            $completeClassName = is_array($this->_initRegisters[$object]) ? $this->_initRegisters[$object]['class'] : $this->_initRegisters[$object];
+            Yii::import($completeClassName);
             
-            if ( IocValidators::isValidYiiNamespace($completeClassName))
-                Yii::import($completeClassName);
-            
-            $this->register($object, IocInfrastructure::getClassFromCompleteClassName($completeClassName));
+            if ( IocValidators::isInterface($object))
+                $this->register($object, IocInfrastructure::getClassFromCompleteClassName($completeClassName));
+            else 
+                $this->registerInstance($object, $this->getInstance(IocInfrastructure::getClassFromCompleteClassName($completeClassName)));
         }   
     }
     
+    protected function getInstanceFromRegisters($object)
+    {
+        $this->registerFromInitIfFound($object);
+        
+        if ( isset($this->_registeredInstances[$object]) )
+            return $this->_registeredInstances[$object];
+    }
+
     public function register($interfaceName, $className)
     {
         $this->validateRegister($interfaceName, $className);
@@ -114,15 +151,13 @@ class IocContainer extends CApplicationComponent
     
     public function getInstance($object)
     {
-        if ( isset($this->_registeredInstances[$object]) )
-            return $this->_registeredInstances[$object];
-        
-        $this->registerFromInitIfFound($object);
-        
-        if ( IocValidators::isInterface($object))
-            return $this->getInstanceToInterface($object);
-        
-        return $this->getInstanceToClass($object);
+        if ( ($instance = $this->getInstanceFromRegisters($object)) )
+            return $instance;
+       
+       $instance =  IocValidators::isInterface($object) ? $this->getInstanceToInterface($object) : $this->getInstanceToClass($object);
+       $this->startParameters($instance);
+       
+       return $instance;
     }
     
     public function getSingletonInstance($object)
@@ -142,5 +177,12 @@ class IocContainer extends CApplicationComponent
         $this->_initRegisters = $registers;
     }
     
+    public function init()
+    {
+        parent::init();
+        $this->_registers = array();
+        $this->_registeredInstances = array();
+        $this->_singletonInstances = array();
+    }
 }
 ?>

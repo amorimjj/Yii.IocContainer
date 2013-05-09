@@ -53,7 +53,15 @@ class IocValidators
      */
     public static function isValidRegister($registers)
     {
-        return is_array($registers);
+        return is_array($registers) && self::validateSecondParameterToRegister($registers);
+    }
+    
+    protected static function validateSecondParameterToRegister($registers)
+    {
+        if ( is_array($param = reset($registers)) && ! array_key_exists('class', $param) )
+            throw new InvalidArgumentException('Class parameter should has a \'class\' key');
+        
+        return true;
     }
     
     /**
