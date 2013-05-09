@@ -110,7 +110,7 @@ class IocContainer extends CApplicationComponent
         if (isset($this->_initRegisters[$object]) && !isset($this->_registeredInstances[$object]))
         {
             $completeClassName = is_array($this->_initRegisters[$object]) ? $this->_initRegisters[$object]['class'] : $this->_initRegisters[$object];
-            //Yii::import($completeClassName);
+            Yii::import($completeClassName);
             
             if ( IocValidators::isInterface($object))
                 $this->register($object, IocInfrastructure::getClassFromCompleteClassName($completeClassName));
