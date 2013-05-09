@@ -1,13 +1,14 @@
 <?php
 
-use test\name_space\ITest2;
+namespace test\name_space;
+
 /**
  * ClassTest8
  *
  * @author Jeferson Amorim <amorimjj@gmail.com>
  */
 class ClassTest8 implements ITest2 {
-    //put your code here
+    public $prop1;
 }
 
 ?>

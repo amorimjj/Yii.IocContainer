@@ -7,6 +7,7 @@ $config=dirname(__FILE__).'/../core/presentation/config/test.php';
 require_once($yiit);
 
 Yii::setPathOfAlias('ext', dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR);
+//Yii::setPathOfAlias('test', dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'tests');
 //require_once( Yii::getPathOfAlias('system.test.CTestCase').'.php' );
 //require_once(dirname(__FILE__).'/WebTestCase.php');
 

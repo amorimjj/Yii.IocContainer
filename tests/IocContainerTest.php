@@ -210,8 +210,8 @@ class IocContainerTest extends PHPUnit_Framework_TestCase {
     
     public function testSetRegisters_WhenTrySetANewRegisterToNamespacedClassAndSecondParameterIsAnArray_ShouldSetParametersValue()
     {
-        $this->_ioc->setRegisters(array('ITest'=>array('class'=>'test\fakes\ClassTest8','prop1'=>'value1')));
-        $instance1 = $this->_ioc->getInstance('ITest');
+        $this->_ioc->setRegisters(array('test\name_space\ITest2'=>array('class'=>'test\name_space\ClassTest8','prop1'=>'value1')));
+        $instance1 = $this->_ioc->getInstance('test\name_space\ITest2');
         $this->assertEquals('value1', $instance1->prop1);
     }
 }
