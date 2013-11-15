@@ -17,7 +17,7 @@ class IocContainerTest extends PHPUnit_Framework_TestCase {
 
     /**
      *
-     * @var IocContainer 
+     * @var IIocContainer 
      */
     private $_ioc;
     
@@ -27,19 +27,19 @@ class IocContainerTest extends PHPUnit_Framework_TestCase {
     }
     
     public function testRegister_WhenTryRegisterAClassToAnInvalidInterface_ShouldThrowInvalidInterfaceException() {
-        $this->setExpectedException('InvalidInterfaceException', 'Invalid interface: IInvalid');
+        $this->setExpectedException('\ioc\exceptions\InvalidInterfaceException', 'Invalid interface: IInvalid');
         $this->_ioc->register('IInvalid', 'Class');
     }
     
     public function testRegister_WhenTryRegisterAClassToAValidInterfaceButClassIsInvalid_ShouldThrowInvalidClassException() {
-        $this->setExpectedException('InvalidClassException', 'Invalid class: Class');
+        $this->setExpectedException('\ioc\exceptions\InvalidClassException', 'Invalid class: Class');
         $this->_ioc->register('SplSubject', 'Class');
     }
     
     public function testRegister_WhenTryRegisterAClassToAValidInterfaceButClassDoesntImplementsIt_ShouldThrowInvalidClassToInterfaceException()
     {
-        $this->setExpectedException('InvalidClassToInterfaceException', 'Class IocValidators is invalid to interface SplSubject');
-        $this->_ioc->register('SplSubject', 'IocValidators');
+        $this->setExpectedException('\ioc\exceptions\InvalidClassToInterfaceException', 'Class \ioc\IocValidators is invalid to interface SplSubject');
+        $this->_ioc->register('SplSubject', '\ioc\IocValidators');
     }
     
     public function testRegister_WhenTryRegisterAClassToAValidInterfaceWhenImplementsIt_CantThrowException()
@@ -55,13 +55,13 @@ class IocContainerTest extends PHPUnit_Framework_TestCase {
     
     public function testGetClassTo_WhenTryRetrieveANotRegisteredInterface_ShouldThrowUnregisteredInterfaceException()
     {
-        $this->setExpectedException('UnregisteredInterfaceException', 'Interface SplObject was not registered');
+        $this->setExpectedException('\ioc\exceptions\UnregisteredInterfaceException', 'Interface SplObject was not registered');
         $this->_ioc->getClassTo('SplObject');
     }
     
     public function testGetInstance_WhenTryRetrieveAInstanceForAUnregisteredInterface_ShouldThrowUnregisteredInterfaceException()
     {
-        $this->setExpectedException('UnregisteredInterfaceException','Interface SplObserver was not registered');
+        $this->setExpectedException('\ioc\exceptions\UnregisteredInterfaceException','Interface SplObserver was not registered');
         $this->_ioc->getInstance('SplObserver');
     }
     
@@ -73,7 +73,7 @@ class IocContainerTest extends PHPUnit_Framework_TestCase {
     
     public function testGetInstance_WhenTryRetrieveAnInstaceToAnInvalidClass_ShouldThrowInvalidClassException()
     {
-        $this->setExpectedException('InvalidClassException', 'Invalid class: Class');
+        $this->setExpectedException('\ioc\exceptions\InvalidClassException', 'Invalid class: Class');
         $this->_ioc->getInstance('Class');
     }
     
@@ -101,7 +101,7 @@ class IocContainerTest extends PHPUnit_Framework_TestCase {
     
     public function testRegisterInstance_WhenTryRegisterAnInstanceAndInstanceNotTypeOfObject_ShouldThrowInvalidInstance()
     {
-        $this->setExpectedException('InvalidInstanceException', 'Instance is invalid to ClassTest5');
+        $this->setExpectedException('\ioc\exceptions\InvalidInstanceException', 'Instance is invalid to ClassTest5');
         $instance = new ClassTest1();
         $this->_ioc->registerInstance('ClassTest5', $instance);
     }
@@ -176,7 +176,8 @@ class IocContainerTest extends PHPUnit_Framework_TestCase {
 
     public function testGetInstance_WhenNewInstanceThatDependsFromARegisteredInstance_ShouldReceiveARegisteredInstance()
     {
-        $this->_ioc->setRegisters(array('Class2'=>'Class3'));
+        $instance3 = new Class3();
+        $this->_ioc->registerInstance('Class2', $instance3);
         $instance1 = $this->_ioc->getInstance('Class1');
         $instance2 = $this->_ioc->getInstance('Class2');
         $this->assertSame($instance1->class, $instance2);
